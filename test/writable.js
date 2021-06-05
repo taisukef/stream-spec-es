@@ -1,6 +1,5 @@
-
-var Stream = require('stream')
-var spec = require('..')
+import { Stream } from "https://taisukef.github.io/stream-es/Stream.js";
+import { StreamSpec as spec } from "../StreamSpec.js";
 
 var tests = 0
 function pass(message) {

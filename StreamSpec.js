@@ -1,6 +1,6 @@
-var a = require('assert')
-var macgyver = require('macgyver')
-var Stream = require('stream')
+import * as a from "https://deno.land/std/testing/asserts.ts";
+import { macgyver } from 'https://taisukef.github.io/macgyver-es/macgyver.js';
+import { Stream } from "https://taisukef.github.io/stream-es/Stream.js";
 
 function merge (to, from) {
   to = to || {}
@@ -11,11 +11,11 @@ function merge (to, from) {
 }
 
 
-module.exports = function (stream, opts) {
+const exports = function (stream, opts) {
   
-  a.ok(stream instanceof Stream)
-  a.ok('function', typeof stream.pipe)
-  a.ok('function', typeof stream.destroy)
+  a.assert(stream instanceof Stream)
+  a.assert('function', typeof stream.pipe)
+  a.assert('function', typeof stream.destroy)
 
   var mac = macgyver()
   var opts = merge(('string' == typeof opts ? {name: opts} : opts) || {}, {name: 'stream'})
@@ -73,13 +73,13 @@ module.exports = function (stream, opts) {
 
 function writableSpec (mac, stream, opts) {
   
-  a.ok('function', typeof stream.destroy, opts.name + '.end *must* be a function')
-  a.equal(stream.writable, true, opts.name + '.writable *must* == true')
+  a.assert('function', typeof stream.destroy, opts.name + '.end *must* be a function')
+  a.assertEquals(stream.writable, true, opts.name + '.writable *must* == true')
   function e (n) { return opts.name + '.emit(\''+n+'\')' }
   function n (n) { return opts.name + '.'+n+'()' }
 
   stream.end = mac(stream.end, n('end')).returns(function () {
-    a.equal(stream.writable, false, opts.name + ' must not be writable after end()')
+    a.assertEquals(stream.writable, false, opts.name + ' must not be writable after end()')
   }).once()
   stream.write = 
     mac(stream.write, n('write'))
@@ -121,7 +121,7 @@ function readableSpec (mac, stream, opts) {
   }, e('end'))
 
   .isPassed(function () {
-    a.equal(stream.readable, false, 'stream must not be readable on "end"')
+    a.assertEquals(stream.readable, false, 'stream must not be readable on "end"')
   })
 
   var onClose = mac(function (){
@@ -200,7 +200,7 @@ function throughPauseSpec (mac, stream, opts) {
   } 
   var onDrain = mac(drain, e('drain')).never()
   
-  a.ok(stream.pause, 'stream *must* have pause')
+  a.assert(stream.pause, 'stream *must* have pause')
 
   if(!stream.readable)
     throw new Error('pause does not make sense for a non-readable stream')
@@ -229,7 +229,7 @@ function throughPauseSpec (mac, stream, opts) {
   if(opts.strict)
     stream.on('data', function onData(data) {
       //stream must not emit data when paused!
-      a.equal(paused, false, 'a strict stream *must not* emit \'data\' when paused')
+      a.assertEquals(paused, false, 'a strict stream *must not* emit \'data\' when paused')
     })
 }
 /*
@@ -261,3 +261,5 @@ function strictSpec (mac, stream, opts) {
   return pauseSpec(mac, stream, merge(opts, {strict: true}))
 }
 
+const StreamSpec = exports;
+export { StreamSpec };
